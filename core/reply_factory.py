@@ -32,6 +32,29 @@ def record_current_answer(answer, current_question_id, session):
     '''
     Validates and stores the answer for the current question to django session.
     '''
+     # Check if current_question_id is valid
+    if current_question_id is None or current_question_id < 0 or current_question_id >= len(PYTHON_QUESTION_LIST):
+        return False, "Invalid question ID."
+
+    # Check for empty or invalid answers
+    if not answer or not isinstance(answer, str):
+        return False, "Invalid answer. Please provide a valid response."
+
+    # Retrieve the correct answer
+    question_data = PYTHON_QUESTION_LIST[current_question_id]
+    correct_answer = question_data.get("answer")
+
+    # Initialize session storage if not present
+    if "user_answers" not in session:
+        session["user_answers"] = []
+
+    # Store the user's answer and correctness
+    session["user_answers"].append({
+        "question_id": current_question_id,
+        "user_answer": answer.strip().lower(),
+        "is_correct": answer.strip().lower() == correct_answer.strip().lower()
+    })
+
     return True, ""
 
 
